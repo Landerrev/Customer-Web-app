@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h1>Create Customer</h1>
+    <form action="/validation" method="post">
+        <input autocomplete="off" autofocus name="name" placeholder="Name" type="text">
+        <input autocomplete="off" autofocus name="surname" placeholder="Surname" type="text">
+        <input autocomplete="off" autofocus name="email" placeholder="Email" type="text">
+        <label for="birthday">Birthday:</label>
+        <input type="date" id="birthday" name="birthday">
+        <input type="submit">
+    </form>
+
+{% endblock %}

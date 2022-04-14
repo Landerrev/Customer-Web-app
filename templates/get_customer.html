@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h1>{{ message }}</h1>
+    <form action="/find_name" method="post">
+        <input autocomplete="off" autofocus name="name" placeholder="Name" type="text">
+        <input autocomplete="off" autofocus name="surname" placeholder="Surname" type="text">
+        <input type="submit" value="Find name + surname">
+    </form>
+    <form action="/find_email" method="post">
+        <input autocomplete="off" autofocus name="email" placeholder="Email" type="text">
+        <input type="submit" value="Find email">
+    </form>
+
+{% endblock %}

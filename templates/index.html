@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <h1>CHOOSE ACTION<h1>
+    <form action="/action" method="post">
+    <select name="action">
+        <option disable selected value=""> Choose Action</option>
+        {% for actions in actions %}
+            <option value="{{ actions }}">{{ actions }}</option>
+        {% endfor %}
+    </select>
+        <input type="submit" value="action">
+    </form>
+
+{% endblock %}
