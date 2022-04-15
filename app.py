@@ -28,6 +28,7 @@ ACTIONS=[
 def index():
     return render_template("index.html", actions=ACTIONS)
 
+
 # Redirecting to choosen action
 @app.route("/action", methods=["POST"])
 def register():
@@ -37,7 +38,6 @@ def register():
         return redirect (nextdir)
     else:
         return redirect ("/")
-
 
 @app.route("/create_customer")
 def create_customer():
@@ -97,12 +97,11 @@ def validation():
 
 
 @app.route("/find_name", methods=["POST"])
-def find_name():
+def get_by_name():
     # Validate name
     name = request.form.get("name")
     if not name:
         return render_template("result.html", message="Missing name")
-
     # Validate surname
     surname = request.form.get("surname")
     if not surname:
@@ -125,19 +124,22 @@ def find_name():
         return render_template("result.html", message="Something went wrong")
     finally:
         con.close()
+
 @app.route("/find_email", methods=["POST"])
 def find_email():
     # Validate email
     email=request.form.get("email")
     if not (re.search(regex,email)):
         return render_template("result.html", message="Not valid email")
+
+
     # Try if contact exists in list
+
     try:
         con=sql.connect("database.db")
         con.row_factory = sql.Row
-
         cur=con.cursor()
-        cur.execute("SELECT * FROM contacts WHERE email=?", (email))
+        cur.execute("SELECT * FROM contacts WHERE email = ?", [email])
 
         rows = cur.fetchall()
         if len(rows)==0: return render_template("result.html", message="Customer email not found")
@@ -145,10 +147,9 @@ def find_email():
 
     except:
         con.rollback()
-        return render_template("result.html", message="Not found")
+        return render_template("result.html", message="Something went wrong")
     finally:
         con.close()
-
 
 
 @app.route("/get_all_customers")
