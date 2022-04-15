@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <table border = 1>
+        <thead>
+        <td>ID</td>
+        <td>Name</td>
+        <td>Surname</td>
+        <td>Email</td>
+        <td>Brithdate</td>
+        </thead>
+
+        {% for row in rows %}
+        <tr>
+            <td>{{row["id"]}}</td>
+            <td>{{row["name"]}}</td>
+            <td>{{row["surname"]}}</td>
+            <td> {{ row["email"]}}</td>
+            <td>{{row["birthdate"]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href = "/">Go back to home page</a>
+
+{% endblock %}

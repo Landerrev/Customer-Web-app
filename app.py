@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 import re
 import sqlite3 as sql
 
@@ -15,26 +15,32 @@ def check(email):
 
 
 # All available actions
-ACTIONS=[
+ACTIONS1=[
     "Create Customer",
     "Get Customer",
-    "Update Customer",
-    "Delete Customer",
     "Get all Customers"
+]
+ACTIONS2=[
+    "Update Customer",
+    "Delete Customer"
 ]
 
 # Main page
 @app.route('/')
 def index():
-    return render_template("index.html", actions=ACTIONS)
+    return render_template("index.html", actions=ACTIONS1)
 
 
 # Redirecting to choosen action
 @app.route("/action", methods=["POST"])
 def register():
     nextdir=request.form.get("action")
-    if nextdir in ACTIONS:
+    if nextdir in ACTIONS1:
         nextdir="/"+ nextdir.lower().replace(" ", "_")
+        return redirect (nextdir)
+    elif nextdir in ACTIONS2:
+        nextdir="/"+ nextdir.lower().replace(" ", "_")
+        id=request.form.get("id")
         return redirect (nextdir)
     else:
         return redirect ("/")
@@ -47,35 +53,22 @@ def create_customer():
 def get_customer():
     return render_template("get_customer.html", message="Get Customer")
 
-@app.route("/update_customer")
-def update_customer():
-    return render_template("get_customer.html", message="Update Customer")
-
-@app.route("/delete_customer")
-def delete_customer():
-    return render_template("get_customer.html", message="Delete Customer")
-
 
 @app.route("/validation", methods=["POST"])
 def validation():
-
     # Validate name
     name = request.form.get("name")
     if not name:
         return render_template("result.html", message="Missing name")
-
     # Validate surname
     surname = request.form.get("surname")
     if not surname:
         return render_template("result.html", message="Missing surname")
-
     # Validate email
     email=request.form.get("email")
     if not (re.search(regex,email)):
         return render_template("result.html", message="Not valid email")
-
     birthdate=request.form.get("birthdate")
-
     # Check new customer & new email, if OK, record
     try:
         with sql.connect("database.db") as con:
@@ -96,55 +89,28 @@ def validation():
 
 
 
-@app.route("/find_name", methods=["POST"])
-def get_by_name():
-    # Validate name
+@app.route("/find", methods=["POST"])
+def find():
+    
     name = request.form.get("name")
-    if not name:
-        return render_template("result.html", message="Missing name")
-    # Validate surname
     surname = request.form.get("surname")
-    if not surname:
-        return render_template("result.html", message="Missing surname")
-
+    email=request.form.get("email")
+    # Validate inputs
+    if not email:
+        if not name or not surname:
+            return render_template("result.html", message="Please fill name+surname or email")
+    elif not (re.search(regex,email)):
+        return render_template("result.html", message="Not valid email")
     # Try if contact exists in list
     try:
         con=sql.connect("database.db")
         con.row_factory = sql.Row
-
         cur=con.cursor()
-        cur.execute("SELECT * FROM contacts WHERE name=? AND surname=?", (name, surname))
-
+        if not email:cur.execute("SELECT * FROM contacts WHERE (name=? AND surname=?)", (name, surname))
+        else: cur.execute("SELECT * FROM contacts WHERE email = ?", [email])
         rows = cur.fetchall()
         if len(rows)==0: return render_template("result.html", message="Name not found")
-        else:return render_template("list.html",rows=rows)
-
-    except:
-        con.rollback()
-        return render_template("result.html", message="Something went wrong")
-    finally:
-        con.close()
-
-@app.route("/find_email", methods=["POST"])
-def find_email():
-    # Validate email
-    email=request.form.get("email")
-    if not (re.search(regex,email)):
-        return render_template("result.html", message="Not valid email")
-
-
-    # Try if contact exists in list
-
-    try:
-        con=sql.connect("database.db")
-        con.row_factory = sql.Row
-        cur=con.cursor()
-        cur.execute("SELECT * FROM contacts WHERE email = ?", [email])
-
-        rows = cur.fetchall()
-        if len(rows)==0: return render_template("result.html", message="Customer email not found")
-        else:return render_template("list.html",rows=rows)
-
+        else:return render_template("list.html",rows=rows,actions=ACTIONS2)
     except:
         con.rollback()
         return render_template("result.html", message="Something went wrong")
@@ -157,12 +123,10 @@ def get_all_customers():
     try:
         con=sql.connect("database.db")
         con.row_factory = sql.Row
-
         cur=con.cursor()
         cur.execute("SELECT * FROM contacts")
-
         rows = cur.fetchall()
-        return render_template("list.html",rows=rows)
+        return render_template("list_all.html",rows=rows)
 
     except:
         con.rollback()
@@ -170,3 +134,28 @@ def get_all_customers():
     finally:
         con.close()    
     
+@app.route("/update_customer")
+def update_customer():
+    id=request.form.get("id")
+    name = request.form.get("name")
+    surname = request.form.get("surname")
+    email=request.form.get("email")
+    birthdate=request.form.get("birthdate")
+    print(id, name, surname)
+    con=sql.connect("database.db")
+    cur=con.cursor()
+    cur.execute("UPDATE contacts SET name=?, surname=?, email=?, birthdate=? WHERE id=?", (name, surname, email, birthdate,id))
+    con.commit()
+    con.close()
+    return redirect ("/get_all_customers")
+
+@app.route("/delete_customer", methods=["POST"])
+def delete_customer():
+    id=request.form.get("id")
+    print(id)
+    con=sql.connect("database.db")
+    cur=con.cursor()
+    cur.execute("DELETE FROM contacts WHERE id = ?",[id])
+    con.commit()
+    con.close()
+    return redirect ("/get_all_customers")

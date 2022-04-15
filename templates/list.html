@@ -4,6 +4,7 @@
 
     <table border = 1>
         <thead>
+        <td>ID</td>
         <td>Name</td>
         <td>Surname</td>
         <td>Email</td>
@@ -12,13 +13,29 @@
 
         {% for row in rows %}
         <tr>
+            <td>{{row["id"]}}</td>
             <td>{{row["name"]}}</td>
             <td>{{row["surname"]}}</td>
-            <td> {{ row["email"]}}</td>
+            <td> {{row["email"]}}</td>
             <td>{{row["birthdate"]}}</td>
         </tr>
         {% endfor %}
     </table>
+    <h2>Further Actions on this Customer<h2>
+
+    <form action="/update_customer" method="post">
+        {% for row in rows %}
+        <input name="id" value="{{row.id}}" type="hidden">
+        <input name="name" value="{{row.name}}" type="text">
+        <input name="surname" value="{{row.surname}}" type="text">
+        <input name="email" value="{{row.email}}" type="text">
+        <label for="birthday">Birthday:</label>
+        <input type="date" id="birthday" name="birthday">
+        <input type="submit" value="Update Customer">
+        <input type="submit" formaction="/delete_customer" value="Delete Customer">
+        {% endfor %}
+
+    </form>
 
     <a href = "/">Go back to home page</a>
 
