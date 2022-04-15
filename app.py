@@ -134,7 +134,7 @@ def get_all_customers():
     finally:
         con.close()    
     
-@app.route("/update_customer")
+@app.route("/update_customer", methods=["POST"])
 def update_customer():
     id=request.form.get("id")
     name = request.form.get("name")
