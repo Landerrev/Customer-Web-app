@@ -117,11 +117,12 @@ def find_name():
         cur.execute("SELECT * FROM contacts WHERE name=? AND surname=?", (name, surname))
 
         rows = cur.fetchall()
-        return render_template("list.html",rows=rows)
+        if len(rows)==0: return render_template("result.html", message="Name not found")
+        else:return render_template("list.html",rows=rows)
 
     except:
         con.rollback()
-        return render_template("result.html", message="Not found")
+        return render_template("result.html", message="Something went wrong")
     finally:
         con.close()
 @app.route("/find_email", methods=["POST"])
@@ -139,7 +140,8 @@ def find_email():
         cur.execute("SELECT * FROM contacts WHERE email=?", (email))
 
         rows = cur.fetchall()
-        return render_template("list.html",rows=rows)
+        if len(rows)==0: return render_template("result.html", message="Customer email not found")
+        else:return render_template("list.html",rows=rows)
 
     except:
         con.rollback()
