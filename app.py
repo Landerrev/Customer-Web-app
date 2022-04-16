@@ -141,7 +141,6 @@ def update_customer():
     surname = request.form.get("surname")
     email=request.form.get("email")
     birthdate=request.form.get("birthdate")
-    print(id, name, surname)
     con=sql.connect("database.db")
     cur=con.cursor()
     cur.execute("UPDATE contacts SET name=?, surname=?, email=?, birthdate=? WHERE id=?", (name, surname, email, birthdate,id))
@@ -152,7 +151,6 @@ def update_customer():
 @app.route("/delete_customer", methods=["POST"])
 def delete_customer():
     id=request.form.get("id")
-    print(id)
     con=sql.connect("database.db")
     cur=con.cursor()
     cur.execute("DELETE FROM contacts WHERE id = ?",[id])
