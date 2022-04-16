@@ -18,7 +18,7 @@ ACTIONS=[
     "Get Customer",
     "Update Customer",
     "Delete Customer",
-    "Get all Customers"
+    "Get all Customerss"
 ]
 
 # Main page
